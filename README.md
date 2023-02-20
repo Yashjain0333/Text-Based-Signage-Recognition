@@ -22,7 +22,7 @@ Awareness for Text Detection (CRAFT) was chosen.
 ### Testing CRAFT
 The model was tested on images taken from the surroundings near the INSPIRE lab. The results were very good as almost all words were segmented even in blurred images. One of these is shown below.
 
-![blur_signage](doc/blur_signage.png)
+![blur_signage](doc/blurSignage.png)
 
 ## Text Recognition
 The next step of the pipeline is text recognition. CRAFT provides cropped images with texts in them and the OCR outputs the text written in the images. Tesseract OCR is considered the state-of-the-art model when it comes to optical character recognition. It was the HP Research Prototype in the UNLV Fourth
@@ -31,7 +31,7 @@ Annual Test of OCR Accuracy.
 ### Inference and Testing
 An example of the output from tesseract OCR is shown below.<br>
 
-![inference_testing](doc/inference_testing.png)
+![inference_testing](doc/inferenceTesting.png)
 
 ## Plane Fitting
 The final step was to extract the plane of the text from the given set of points. For this task, the RANSAC algorithm was used as it is a robust plane fitting model in the presence of many data outliers. The time taken by the algorithm will depend on the maximum number of iterations which can be altered depending on the required level of accuracy.
