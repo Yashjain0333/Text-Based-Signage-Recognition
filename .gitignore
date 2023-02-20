@@ -1,8 +1,2 @@
-*.pyc
-*.swp
-*.pkl
-*.pth
-result*
-weights*
 .DS_Store
 cpp_bindings/build/**
