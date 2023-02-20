@@ -1,3 +1,5 @@
+# Code from: https://github.com/clovaai/deep-text-recognition-benchmark
+
 import torch
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -21,7 +23,6 @@ class CTCLabelConverter(object):
         input:
             text: text labels of each image. [batch_size]
             batch_max_length: max length of text label in the batch. 25 by default
-
         output:
             text: text index for CTCLoss. [batch_size, batch_max_length]
             length: length of each text. [batch_size]
@@ -119,7 +120,6 @@ class AttnLabelConverter(object):
         input:
             text: text labels of each image. [batch_size]
             batch_max_length: max length of text label in the batch. 25 by default
-
         output:
             text : the input of attention decoder. [batch_size x (max_length+2)] +1 for [GO] token and +1 for [s] token.
                 text[:, 0] is [GO] token and text is padded with [GO] token after [s] token.

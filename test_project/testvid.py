@@ -1,8 +1,3 @@
-"""  
-Copyright (c) 2019-present NAVER Corp.
-MIT License
-"""
-
 # -*- coding: utf-8 -*-
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages') # in order to import cv2 under python3
@@ -16,6 +11,7 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 
 from PIL import Image
+
 import cv2
 from skimage import io
 import numpy as np
@@ -165,15 +161,11 @@ if __name__ == '__main__':
     print (hasFrames)
     height, width, layers = image.shape
     size = (width,height)    
-    # load data
-    k=0
+    
+    k = 0
     while (hasFrames):
         k=k+1
         hasFrames,image = vidcap.read()
-        if(k%100==0):
-          print("Frame {:d}".format(k))
-        if(k%30!=0):
-          continue
         image = np.asarray( image )#imgproc.loadImage(image_path)
         try:
           height, width, layers = image.shape
@@ -185,6 +177,8 @@ if __name__ == '__main__':
 
     texts = np.array(texts)
     texts = set(texts)
+
+#   Print the text found in the video realtime
     print(texts)
 
     print("elapsed time : {}s".format(time.time() - t))

@@ -1,7 +1,7 @@
 #include "dilate.hpp"
 
-
 // https://github.com/opencv/opencv/blob/198b5096aaf8f5d855b98337e9de2fc45485c5a7/modules/ts/src/ts_func.cpp#L642
+
 void dilate(const unsigned char *src, int srcW, int srcH,
         unsigned char *dst, int dstW, int dstH,
         const unsigned char *kernel, int kerW, int kerH,

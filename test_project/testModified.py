@@ -1,8 +1,3 @@
-"""  
-Copyright (c) 2019-present NAVER Corp.
-MIT License
-"""
-
 # -*- coding: utf-8 -*-
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages') # in order to import cv2 under python3
@@ -16,6 +11,7 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 
 from PIL import Image
+
 import cv2
 from skimage import io
 import numpy as np
@@ -24,7 +20,7 @@ import imgproc
 import file_utils
 import json
 import zipfile
-from realsensecv import RealsenseCapture
+
 from craft import CRAFT
 
 from collections import OrderedDict
@@ -57,16 +53,11 @@ parser.add_argument('--refine', default=False, action='store_true', help='enable
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
 
 args = parser.parse_args()
-#for output
-pathOut = 'video_out_large.avi'
-fps = 24
-frame_array = []
-texts = []
+
 
 """ For test images in a folder """
 image_list, _, _ = file_utils.get_files(args.test_folder)
-
-
+texts = []
 result_folder = './result/'
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
@@ -124,6 +115,8 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
     return boxes, polys, ret_score_text, char_boxes
 
+
+
 if __name__ == '__main__':
     # load net
     net = CRAFT()     # initialize
@@ -159,53 +152,17 @@ if __name__ == '__main__':
 
     t = time.time()
 
-    # vidcap = cv2.VideoCapture('video_large.mp4')
-    vidcap = RealsenseCapture()
-    vidcap.WIDTH = 1920
-    vidcap.HEIGHT = 1080
-    vidcap.FPS = 30
-    vidcap.start()
-    #vidcap.set(cv2.CAP_PROP_POS_MSEC,sec*1000)
-    hasFrames,image = vidcap.read()
-    print (hasFrames)
-    # image = image[0]
-    height, width, layers = image.shape
-    size = (width,height)
     # load data
-    k=0
-    while (hasFrames):
-        k=k+1
-        hasFrames,image = vidcap.read()
-        if(k%100==0):
-          print("Frame {:d}".format(k))
-        if(k%30!=0):
-          continue
-        image = np.asarray( image )#imgproc.loadImage(image_path)
-        try:
-          height, width, layers = image.shape
-          bboxes, polys, score_text, char_boxes = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        except:
-          break
+    for k, image_path in enumerate(image_list):
+        print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
+        image = imgproc.loadImage(image_path)
+
+        bboxes, polys, score_text, char_boxes = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
 
         # save score text
-        #filename, file_ext = os.path.splitext(os.path.basename(image_path))
-        #mask_file = result_folder + "/res_" + filename + '_mask.jpg'
-        #cv2.imwrite(mask_file, score_text)
-        file_utils.drawboxes(k,image, polys, texts)
-        try:
-          height, width, layers = image.shape
-          bboxes, polys, score_text, char_boxes = test_net(net, image_np, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        except:
-          break
-
-        image=file_utils.drawboxes(k,image, polys, texts)
-        # cv2.imshow('OP',image)
-        # cv2.waitKey(20)
-
-    texts = np.array(texts)
-    texts = set(texts)
-    print(texts)
-    cap.release()
-    cv2.destroyAllWindows()
+        filename, file_ext = os.path.splitext(os.path.basename(image_path))
+        mask_file = result_folder + "/res_" + filename + '_mask.jpg'
+        cv2.imwrite(mask_file, score_text)
+        file_utils.drawboxes(image_path, k,image, polys, texts)
 
     print("elapsed time : {}s".format(time.time() - t))

@@ -1,33 +1,27 @@
-"""  
-Copyright (c) 2019-present NAVER Corp.
-MIT License
-"""
-
 # -*- coding: utf-8 -*-
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages') # in order to import cv2 under python3
 import os
 import time
 import argparse
+
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 
 from PIL import Image
+
 import cv2
 from skimage import io
 import numpy as np
 import craft_utils
 import imgproc
-import plane_detector
 import file_utils
-import file_utils1
 import json
 import zipfile
 from realsensecv import RealsenseCapture
 from craft import CRAFT
-import pyrealsense2 as rs
 
 from collections import OrderedDict
 def copyStateDict(state_dict):
@@ -66,7 +60,8 @@ frame_array = []
 texts = []
 
 """ For test images in a folder """
-image_list, _, _ = file_utils1.get_files(args.test_folder)
+image_list, _, _ = file_utils.get_files(args.test_folder)
+
 
 result_folder = './result/'
 if not os.path.isdir(result_folder):
@@ -125,67 +120,6 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
     return boxes, polys, ret_score_text, char_boxes
 
-def get_image():
-    # Define some constants
-    resolution_width = 1280  # pixels
-    resolution_height = 720  # pixels
-    frame_rate = 15  # fps
-
-    # Create a pipeline
-    pipeline = rs.pipeline()
-
-    # Enable depth, infrared, color streams
-    config = rs.config()
-    config.enable_stream(rs.stream.depth, resolution_width, resolution_height, rs.format.z16, frame_rate)
-    config.enable_stream(rs.stream.infrared)  # , 1, resolution_width, resolution_height, rs.format.y8, frame_rate)
-    config.enable_stream(rs.stream.color, resolution_width, resolution_height, rs.format.bgr8, frame_rate)
-
-    pc = rs.pointcloud()
-    pipeline.start(config)
-
-    colorizer = rs.colorizer()
-    align_to = rs.stream.color
-    align = rs.align(align_to)
-    align1 = rs.align(align_to)
-
-    colorizer = rs.colorizer()
-
-    align = rs.align(rs.stream.depth)
-    align1 = rs.align(rs.stream.color)
-
-    # skip the fist Frames
-    for i in range(10):
-        # Get frameset of color and depth
-        frames = pipeline.wait_for_frames()
-
-    aligned = align.process(frames)
-    aligned1 = align1.process(frames)
-    color_aligned_to_depth = aligned.first(rs.stream.color)
-    color_aligned_to_depth1 = aligned1.first(rs.stream.color)
-
-    depth_frame = frames.first(rs.stream.depth)
-    color_frame = aligned.get_color_frame()
-    color_frame1 = aligned1.get_color_frame()
-
-    # Apply filters
-    filters = [rs.disparity_transform(),
-               rs.spatial_filter(),
-               rs.temporal_filter(),
-               rs.disparity_transform(False)]
-    for f in filters:
-        depth_frame = f.process(depth_frame)
-
-    color = np.asanyarray(color_frame.get_data())
-    color1 = np.asanyarray(color_frame1.get_data())
-    points = pc.calculate(depth_frame)
-    w = rs.video_frame(depth_frame).width
-    h = rs.video_frame(depth_frame).height
-    vertices = np.asanyarray(points.get_vertices()).view(np.float32).reshape(h, w, 3)
-
-    # Stop pipeline
-    pipeline.stop()
-    return color1, vertices
-
 if __name__ == '__main__':
     # load net
     net = CRAFT()     # initialize
@@ -221,27 +155,42 @@ if __name__ == '__main__':
 
     t = time.time()
 
+    # vidcap = cv2.VideoCapture('video_large.mp4')
+    vidcap = RealsenseCapture()
+    vidcap.WIDTH = 1920
+    vidcap.HEIGHT = 1080
+    vidcap.FPS = 30
+    vidcap.start()
+    #vidcap.set(cv2.CAP_PROP_POS_MSEC,sec*1000)
+    hasFrames,image = vidcap.read()
+    print (hasFrames)
+    image = image[0]
+    height, width, layers = image.shape
+    size = (width,height)
     # load data
-    k = 0
-    while (1):
-        k = k + 1
-        image, verts = get_image()
-
-        # cv2.imshow('OP',image)
-        # cv2.waitKey(20)
-        image = np.asarray(image)
-
+    k=0
+    while (hasFrames):
+        k=k+1
+        hasFrames,image = vidcap.read()
+        depth_image = image[1]
+        image = image[0]
+        if(k%100==0):
+          print("Frame {:d}".format(k))
+        if(k%30!=0):
+          continue
+        image = np.asarray(image)#imgproc.loadImage(image_path)
         try:
-            height, width, layers = image.shape
-            bboxes, polys, score_text, char_boxes = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
+          height, width, layers = image.shape
+          bboxes, polys, score_text, char_boxes = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
         except:
-            break
-        print("Done with CRAFT!")
-        img = file_utils1.drawboxes(k,image, polys, texts, verts)
+          break
+
+        img = file_utils.drawboxes(k,image, polys, texts, depth_image)
 
     texts = np.array(texts)
     texts = set(texts)
-    # print(texts)
+    print(texts)
+    vidcap.release()
     cv2.destroyAllWindows()
 
     print("elapsed time : {}s".format(time.time() - t))

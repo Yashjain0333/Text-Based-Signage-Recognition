@@ -1,3 +1,5 @@
+# Code from: https://github.com/felixchenfy/ros_detect_planes_from_depth_img
+
 set -e
 
 # 1. Publish color and depth images.

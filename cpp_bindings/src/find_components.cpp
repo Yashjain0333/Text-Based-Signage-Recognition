@@ -1,3 +1,5 @@
+// Code from: https://github.com/opencv/opencv/blob/624d532000d726734637e6d51c8e40785f45b46b/modules/imgproc/src/imgwarp.cpp#L3238
+
 #include "find_components.hpp"
 
 int max_coord[MAX_COMPONENTS*2];
@@ -24,7 +26,7 @@ void matmul(float *mat1, int mat1Rows, int mat1Cols, float *mat2, int mat2Rows, 
 }
 
 void getRotationMatrix2D(float cx, float cy, float angle, float *outRot) {
-    // Code from: https://github.com/opencv/opencv/blob/624d532000d726734637e6d51c8e40785f45b46b/modules/imgproc/src/imgwarp.cpp#L3238
+
     angle *= PI/180;
     float alpha = cos(angle);
     float beta = sin(angle);

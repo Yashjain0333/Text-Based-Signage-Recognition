@@ -1,3 +1,5 @@
+# Code from: https://github.com/felixchenfy/ros_detect_planes_from_depth_img
+
 import ctypes
 import numpy as np
 from numpy.ctypeslib import ndpointer

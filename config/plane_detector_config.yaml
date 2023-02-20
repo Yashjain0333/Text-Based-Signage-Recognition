@@ -1,3 +1,5 @@
+# Taken from https://github.com/felixchenfy/ros_detect_planes_from_depth_img
+
 # Configuration for `run_server.py` and `plane_detector.py`
 
 # ====================================================================== #

@@ -1,3 +1,5 @@
+# Code from: https://github.com/clovaai/deep-text-recognition-benchmark
+
 import numpy as np
 import torch
 import torch.nn as nn

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# Code from: https://github.com/felixchenfy/ros_detect_planes_from_depth_img
 
 from ros_detect_planes_from_depth_img.msg import PlanesResults
 from plane_detector import PlaneDetector, PlaneParam

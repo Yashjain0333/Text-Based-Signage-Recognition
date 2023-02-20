@@ -1,3 +1,5 @@
+// Original code: https://github.com/opencv/opencv/blob/dd1494eebf205b0262c362bbdc57cef212464d1d/modules/imgproc/src/rotcalipers.cpp
+
 #include "rotated_bounding_box.hpp"
 
 static void rotatingCalipers( const std::vector<Point> &points, int n, float* out )

@@ -1,5 +1,6 @@
-import torch.nn as nn
+# Code from: https://github.com/clovaai/deep-text-recognition-benchmark
 
+import torch.nn as nn
 
 class BidirectionalLSTM(nn.Module):
 

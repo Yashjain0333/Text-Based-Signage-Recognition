@@ -1,4 +1,3 @@
-// Original code: https://cp-algorithms.com/geometry/grahams-scan-convex-hull.html
 #ifndef CONVEX_HULL_H
 #define CONVEX_HULL_H
 
@@ -18,9 +17,9 @@ struct Point {
     };
 };
 
-bool cmp(Point a, Point b);
-bool cw(Point a, Point b, Point c);
-bool ccw(Point a, Point b, Point c);
+bool compare(Point a, Point b);
+bool clockwise(Point a, Point b, Point c);
+bool counterClockwise(Point a, Point b, Point c);
 
 void convexHull(std::vector<Point>& a);
 

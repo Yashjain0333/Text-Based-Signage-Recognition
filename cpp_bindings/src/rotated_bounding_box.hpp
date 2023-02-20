@@ -1,4 +1,3 @@
-// Original code: https://github.com/opencv/opencv/blob/dd1494eebf205b0262c362bbdc57cef212464d1d/modules/imgproc/src/rotcalipers.cpp
 #ifndef ROTATED_BOUNDING_BOX_H
 #define ROTATED_BOUNDING_BOX_H
 

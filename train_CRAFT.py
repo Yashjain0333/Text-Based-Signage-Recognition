@@ -1,3 +1,5 @@
+# Code from: https://github.com/clovaai/deep-text-recognition-benchmark
+
 import os
 import sys
 import time
